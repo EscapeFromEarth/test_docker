@@ -1,0 +1,4 @@
+# 匹配所有名字为 build 和 .vscode 的文件夹
+/**/build/
+/**/.vscode/
+
