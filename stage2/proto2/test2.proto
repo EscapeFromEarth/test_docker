@@ -1,0 +1,7 @@
+syntax = "proto3";
+package Test2;
+
+message Toy {
+	optional uint32 color = 1;
+	optional bytes desc = 2;
+}

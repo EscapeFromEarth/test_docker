@@ -1,0 +1,9 @@
+syntax = "proto3";
+package Test;
+
+import "proto2/test2.proto";
+
+message Child {
+	optional uint32 age = 1;
+	repeated Test2.Toy toy = 2;
+}
