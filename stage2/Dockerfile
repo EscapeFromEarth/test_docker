@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y build-essential cmake wget
 WORKDIR /tmp
 
 # --strip-components=1 表示去掉解压后的那个顶层的文件夹
-# ls -la /tmp/protobuf 展示下是否正常解压
 RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.4/protobuf-cpp-3.19.4.tar.gz && \
 	mkdir -p /tmp/protobuf && \
 	tar -xzvf protobuf-cpp-3.19.4.tar.gz -C /tmp/protobuf --strip-components=1
