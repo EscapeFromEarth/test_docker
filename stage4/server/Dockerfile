@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM mybaseimage:v1
 WORKDIR /app
 COPY . .
-RUN apt-get update && apt-get install -y net-tools build-essential && g++ -o server server.cpp
+RUN apt-get install -y net-tools && g++ -o server server.cpp

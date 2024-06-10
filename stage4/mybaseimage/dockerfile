@@ -1,0 +1,5 @@
+# 必须构建个基础镜像了。。不然每次都去 apt-get update 真浪费时间。
+# 这个叫做 mybaseimage:v1
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y build-essential cmake

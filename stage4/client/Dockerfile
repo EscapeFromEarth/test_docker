@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM mybaseimage:v1
 WORKDIR /app
 COPY . .
-RUN apt-get update && apt-get install -y build-essential && g++ -o client client.cpp
+RUN g++ -o client client.cpp

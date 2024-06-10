@@ -3,14 +3,27 @@
 #include "sys/socket.h"
 #include "arpa/inet.h"
 #include "cstring"
+#include "string"
+#include "cstdarg"
+
+void Log(const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	int iSize = vsnprintf(nullptr, 0, format, args) + 1;
+	std::string sBuffer(iSize, '\0');
+	va_start(args, format);
+	vsnprintf(&sBuffer[0], iSize, format, args);
+	va_end(args);
+	std::cout << sBuffer << std::endl;
+}
 
 int main() {
 	int iSocketFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (iSocketFd < 0) {
-		printf("ERR: create socket error.\n");
+		Log("ERR: create socket error.");
 		return 1;
 	}
-	printf("MSG: create socket succ. socket fd %d\n", iSocketFd);
+	Log("MSG: create socket succ. socket fd %d", iSocketFd);
 	const std::string sIp = "0.0.0.0";
 	const int iPort = 13352;
 	struct sockaddr_in oSockaddr;
@@ -20,32 +33,32 @@ int main() {
 	oSockaddr.sin_port = htons(iPort);
 	int iRet = bind(iSocketFd, (sockaddr*)&oSockaddr, sizeof(oSockaddr));
 	if (iRet < 0) {
-		printf("ERR: socket bind error. ret %d\n", iRet);
+		Log("ERR: socket bind error. ret %d", iRet);
 		return 2;
 	}
-	printf("MSG: socket bind succ. ip=%s, port=%d\n", sIp.c_str(), iPort);
+	Log("MSG: socket bind succ. ip=%s, port=%d", sIp.c_str(), iPort);
 	iRet = listen(iSocketFd, 1024);
 	if (iRet < 0) {
-		printf("ERR: socket listen error.");
+		Log("ERR: socket listen error.");
 		return 3;
 	}
-	printf("MSG: socket bind succ. linstening ...\n");
+	Log("MSG: socket bind succ. linstening ...");
 	while (true) {
 		int iConnectFd = accept(iSocketFd, nullptr, nullptr);
 		if (iConnectFd < 0) {
-			printf("ERR: socket accept error.\n");
+			Log("ERR: socket accept error.");
 			continue;
 		}
-		printf("MSG: socket accept succ. connect fd %d\n", iConnectFd);
+		Log("MSG: socket accept succ. connect fd %d", iConnectFd);
 		const int iBufferSize = 1 << 10;
 		char sBuffer[iBufferSize];
 		int iLen = recv(iConnectFd, sBuffer, iBufferSize - 1, 0);
 		if (iLen >= 0 && iLen < iBufferSize) {
 			sBuffer[iLen] = '\0';
-			printf("MSG: recv client msg succ. connect fd %d, msg len %d,"
-				   " msg %s\n", iConnectFd, iLen, sBuffer);
+			Log("MSG: recv client msg succ. connect fd %d, msg len %d,"
+				   " msg %s", iConnectFd, iLen, sBuffer);
 		} else {
-			printf("ERR: recv client msg error. connect fd %d\n", iConnectFd);
+			Log("ERR: recv client msg error. connect fd %d", iConnectFd);
 			continue;
 		}
 		for (int i = 0; i < iLen; i++) {
@@ -56,13 +69,13 @@ int main() {
 		}
 		int iRet = send(iConnectFd, sBuffer, iLen, 0);
 		if (iRet < 0) {
-			printf("ERR: send msg error. connect fd %d\n", iConnectFd);
+			Log("ERR: send msg error. connect fd %d", iConnectFd);
 			continue;
 		}
-		printf("MSG: send msg succ. connect fd %d, msg len %d, msg %s\n",
+		Log("MSG: send msg succ. connect fd %d, msg len %d, msg %s",
 			   iConnectFd, iLen, sBuffer);
 	}
-	printf("ERR: server interrupt.\n");
+	Log("ERR: server interrupt.");
 	close(iSocketFd);
 	return 7;
 }

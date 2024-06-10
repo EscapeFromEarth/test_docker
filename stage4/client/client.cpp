@@ -3,19 +3,32 @@
 #include "sys/socket.h"
 #include "arpa/inet.h"
 #include "cstring"
+#include "string"
+#include "cstdarg"
+
+void Log(const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	int iSize = vsnprintf(nullptr, 0, format, args) + 1;
+	std::string sBuffer(iSize, '\0');
+	va_start(args, format);
+	vsnprintf(&sBuffer[0], iSize, format, args);
+	va_end(args);
+	std::cout << sBuffer << std::endl;
+}
 
 // 因为不清楚容器 ip 长什么样，所以还是运行时指定
 int main(int argc, char *argv[]) { // argv[0] 是可执行程序名称
 	if (argc < 3) {
-		printf("ERR: Instruction format error. example: ./clent server_ip server_prot\n");
+		Log("ERR: Instruction format error. example: ./clent server_ip server_prot");
 		return 1;
 	}
 	int iSocketFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (iSocketFd < 0) {
-		printf("ERR: create socket error.\n");
+		Log("ERR: create socket error.");
 		return 2;
 	}
-	printf("MSG: create socket succ. socket fd %d\n", iSocketFd);
+	Log("MSG: create socket succ. socket fd %d", iSocketFd);
 	const std::string sIp = argv[1];
 	const int iPort = atoi(argv[2]);
 	struct sockaddr_in oSockaddr;
@@ -25,25 +38,25 @@ int main(int argc, char *argv[]) { // argv[0] 是可执行程序名称
 	oSockaddr.sin_port = htons(iPort);
 	int iRet = connect(iSocketFd, (sockaddr*)&oSockaddr, sizeof(oSockaddr));
 	if (iRet) {
-		printf("ERR: socket connect error. ip %s, port %d\n", sIp.c_str(), iPort);
+		Log("ERR: socket connect error. ip %s, port %d", sIp.c_str(), iPort);
 		return 3;
 	}
-	printf("MSG: socket connect succ. ip %s, port %d\n", sIp.c_str(), iPort);
+	Log("MSG: socket connect succ. ip %s, port %d", sIp.c_str(), iPort);
 	std::string sData = "hello";
 	iRet = send(iSocketFd, sData.c_str(), sData.size(), 0);
 	if (iRet < 0) {
-		printf("ERR: send msg error. msg %s\n", sData.c_str());
+		Log("ERR: send msg error. msg %s", sData.c_str());
 		return 4;
 	}
-	printf("MSG: send msg succ. msg %s\n", sData.c_str());
+	Log("MSG: send msg succ. msg %s", sData.c_str());
 	const int iBufferSize = 1 << 10;
 	char sBuffer[iBufferSize];
 	int iLen = recv(iSocketFd, sBuffer, iBufferSize - 1, 0);
 	if (iLen >= 0 && iLen < iBufferSize) {
 		sBuffer[iLen] = '\0';
-		printf("MSG: recv server msg succ. msg len %d, msg %s\n", iLen, sBuffer);
+		Log("MSG: recv server msg succ. msg len %d, msg %s", iLen, sBuffer);
 	} else {
-		printf("ERR: recv client msg error. socket fd %d\n", iSocketFd);
+		Log("ERR: recv client msg error. socket fd %d", iSocketFd);
 		return 5;
 	}
 	close(iSocketFd);

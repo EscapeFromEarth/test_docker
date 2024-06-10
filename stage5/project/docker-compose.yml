@@ -1,0 +1,15 @@
+# 本质上是构建两个容器，分别取名叫 server、client
+services:
+  server: # 这个演示用镜像的方法
+    image: mytest:v3 # 这个就是上一阶段构建的 server 镜像
+    command: /bin/bash -c "ifconfig; cd /app; ./server"
+    ports: # 需要曝光端口的时候可以这样弄
+      - 8000:13352
+    environment: # 如果需要则自己指定时区，镜像里面时区是默认的
+      - TZ=Asia/Shanghai
+  client:
+    build: ./
+    volumes: # 挂载，这次的是可以用相对路径的
+      - ./:/app
+    environment:
+      - TZ=Asia/Shanghai
