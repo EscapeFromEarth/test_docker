@@ -10,11 +10,9 @@
 
 ```bash
 # 运行容器指令
-docker run -it -p 8000:13352 --name server --network test-net mytest:v3 /bin/bash
+docker run -d -p 8000:13352 --name server --network test-net mytest:v3 /bin/bash
 # 进入容器之后查看下 ip 地址，出现两个 inet 值，其中非 127.0.0.1 的就是
 ifconfig
-# 启动服务器
-./server
 ```
 
 然后创建客户端镜像，再运行容器
